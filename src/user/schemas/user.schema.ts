@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, UpdateQuery } from 'mongoose';
+import * as bcrypt from 'bcrypt';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -40,4 +41,24 @@ UserSchema.virtual('fullName').get(function () {
 
 UserSchema.set('toObject', {
   virtuals: true,
+});
+
+// schema middlewares to handle
+// schema lifecycle, in this case hashing password when inserting and updating
+/* eslint-disable */
+UserSchema.pre('save', async function (next) {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+
+  next();
+});
+
+UserSchema.pre('findOneAndUpdate', function (next) {
+  const update = this.getUpdate() as UpdateQuery<User>;
+  if (update && update.$set && update.$set.password) {
+    update.$set.password = bcrypt.hashSync(update.$set.password, 10);
+  }
+
+  next();
 });

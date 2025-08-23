@@ -34,13 +34,11 @@ export class UserService {
       .findOneAndUpdate({ _id: id }, { $set: updateUserDto }, { new: true })
       .lean();
 
-    console.log(user);
-
     return UserResponseDto.fromDocument(user!);
   }
 
   async remove(id: string) {
-    const user = await this.userModel.findOneAndDelete({ _id: id }).lean();
+    const user = await this.userModel.findByIdAndDelete({ _id: id }).lean();
 
     return UserResponseDto.fromDocument(user!);
   }
