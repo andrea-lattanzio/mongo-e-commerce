@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, UpdateQuery } from 'mongoose';
+import { HydratedDocument, Model, UpdateQuery } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 
 export type UserDocument = HydratedDocument<User>;
@@ -7,6 +7,10 @@ export type UserDocument = HydratedDocument<User>;
 export enum UserRole {
   ADMIN = 'admin',
   CUSTOMER = 'customer',
+}
+
+export interface UserModel extends Model<UserDocument> {
+  findByEmail(email: string): Promise<UserDocument | null>;
 }
 
 @Schema({
@@ -62,3 +66,8 @@ UserSchema.pre('findOneAndUpdate', function (next) {
 
   next();
 });
+
+// static method callable on the UserModel object to find one by email
+UserSchema.statics.findByEmail = function (email: string) {
+  return this.findOne({ email: email }).lean();
+};
