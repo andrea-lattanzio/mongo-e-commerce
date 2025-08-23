@@ -38,11 +38,6 @@ UserSchema.virtual('fullName').get(function () {
   return `${this.firstName} ${this.lastName}`;
 });
 
-// rimuovo password quando serializzo a json
-UserSchema.set('toJSON', {
+UserSchema.set('toObject', {
   virtuals: true,
-  transform: (doc, ret) => {
-    delete (ret as Partial<User>).password;
-    return ret;
-  },
 });
