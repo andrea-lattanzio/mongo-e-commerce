@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { FindByNameQueryDto } from './dto/query/FindByNameQuery.dto';
 
 @Controller('product')
 export class ProductController {
@@ -17,8 +18,14 @@ export class ProductController {
     return this.productService.findAll();
   }
 
+  @Get('/name')
+  findByName(@Query() findByNameQueryDto: FindByNameQueryDto) {
+    return this.productService.findByName(findByNameQueryDto);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
+    console.log('here');
     return this.productService.findOne(id);
   }
 
