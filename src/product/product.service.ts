@@ -4,7 +4,8 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductResponseDto } from './dto/product-response.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product, ProductModel } from './schemas/product.schema';
-import { FindByNameQueryDto } from './dto/query/FindByNameQuery.dto';
+import { FindByNameQueryDto } from './dto/query/find-by-name.dto';
+import { FindByCategoryDto } from './dto/query/find-by-category.dto';
 
 @Injectable()
 export class ProductService {
@@ -31,7 +32,14 @@ export class ProductService {
 
   async findByName(findByNameQueryDto: FindByNameQueryDto): Promise<ProductResponseDto[]> {
     const { name } = findByNameQueryDto;
-    const product = await this.productModel.findbyName(name);
+    const product = await this.productModel.findByName(name);
+
+    return ProductResponseDto.fromDocuments(product!);
+  }
+
+  async findByCategory(findByCategoryDto: FindByCategoryDto): Promise<ProductResponseDto[]> {
+    const { category } = findByCategoryDto;
+    const product = await this.productModel.findByCategory(category);
 
     return ProductResponseDto.fromDocuments(product!);
   }

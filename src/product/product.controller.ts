@@ -2,11 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { FindByNameQueryDto } from './dto/query/FindByNameQuery.dto';
+import { FindByNameQueryDto } from './dto/query/find-by-name.dto';
+import { FindByCategoryDto } from './dto/query/find-by-category.dto';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) { }
+  constructor(private readonly productService: ProductService) {}
 
   @Post()
   async create(@Body() createProductDto: CreateProductDto) {
@@ -21,6 +22,11 @@ export class ProductController {
   @Get('/name')
   findByName(@Query() findByNameQueryDto: FindByNameQueryDto) {
     return this.productService.findByName(findByNameQueryDto);
+  }
+
+  @Get('/category')
+  findByCategory(@Query() findByCategoryDto: FindByCategoryDto) {
+    return this.productService.findByCategory(findByCategoryDto);
   }
 
   @Get(':id')

@@ -4,8 +4,8 @@ import { HydratedDocument, Model } from 'mongoose';
 export type ProductDocument = HydratedDocument<Product>;
 
 export interface ProductModel extends Model<ProductDocument> {
-  findbyName(name: string): Promise<ProductDocument[] | null>;
-  findbyCategory(category: string): Promise<ProductDocument[] | ProductDocument | null>;
+  findByName(name: string): Promise<ProductDocument[] | null>;
+  findByCategory(category: string): Promise<ProductDocument[] | null>;
 }
 
 @Schema({
@@ -38,12 +38,12 @@ ProductSchema.index({ price: 1 }); // already sorts the data so that a sort quer
 
 // static methods
 /* eslint-disable */
-ProductSchema.statics.findbyName = function (name: string) {
+ProductSchema.statics.findByName = function (name: string) {
   return this.find({ name: name }).lean();
 };
 
-ProductSchema.statics.findbyCategory = function (category: string) {
+ProductSchema.statics.findByCategory = function (category: string) {
   return this.find({
     categories: { $in: [category] },
-  });
+  }).lean();
 };
