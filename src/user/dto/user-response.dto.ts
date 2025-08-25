@@ -2,7 +2,7 @@ import { Exclude, plainToInstance } from 'class-transformer';
 import { UserDocument } from '../schemas/user.schema';
 
 export class UserResponseDto {
-  id: string;
+  _id: string;
   firstName: string;
   lastName: string;
   fullName: string;
@@ -11,8 +11,6 @@ export class UserResponseDto {
 
   @Exclude()
   password: string;
-  @Exclude()
-  _id: string;
 
   static fromDocument(documentObject: UserDocument): UserResponseDto {
     return plainToInstance(UserResponseDto, documentObject);
