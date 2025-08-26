@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ObjectId, Types } from 'mongoose';
+import { HydratedDocument, ObjectId, Types } from 'mongoose';
 import { ProductDocument } from 'src/product/schemas/product.schema';
+
+export type OrderDocument = HydratedDocument<Order>;
 
 @Schema({
   timestamps: true,
@@ -15,9 +17,14 @@ export class Order {
   // products: ObjectId[];
 
   @Prop({
-    type: [{ product: Types.ObjectId, quantity: { type: Number, min: 1 } }],
+    type: [
+      {
+        product: { type: Types.ObjectId, ref: 'Product' },
+        quantity: Number,
+      },
+    ],
   })
-  products: { product: ObjectId; quantity: number }[];
+  orderItems: { product: ObjectId, quantity: number }[];
 
   @Prop()
   totalPrice: number;
@@ -27,10 +34,11 @@ export const OrderSchema = SchemaFactory.createForClass(Order);
 
 /* eslint-disable */
 OrderSchema.pre('save', async function (next) {
-  if (this.isModified('products')) {
+  if (this.isModified('orderItems')) {
     const productModel = this.model('Product');
+    const productIds = this.orderItems.map((orderItem) => orderItem.product);
     const products: ProductDocument[] = await productModel.find({
-      _id: { $in: this.products },
+      _id: { $in: productIds },
     });
 
     // total price for single selection of products
@@ -39,18 +47,16 @@ OrderSchema.pre('save', async function (next) {
     //   0,
     // );
 
-    const productPriceMap = new Map();
-    products.forEach((product) => {
+    const productPriceMap = new Map<string, number>();
+    products.forEach(product => {
       productPriceMap.set(product._id.toString(), product.price);
     });
 
-    const total = this.products.reduce((sum, orderItem) => {
+    let total = 0;
+    this.orderItems.forEach(orderItem => {
       const price = productPriceMap.get(orderItem.product.toString());
-      if (price) {
-        return sum + price * orderItem.quantity;
-      }
-      return sum;
-    }, 0);
+      if (price) total += price * orderItem.quantity;
+    });
 
     this.totalPrice = total;
   }
