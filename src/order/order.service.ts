@@ -10,6 +10,8 @@ import {
   RevenueByDayDto,
   RevenueByDayResponseDto,
 } from './dto/aggregations/revenue-by-day.dto';
+import { RevenueByUserResponseDto } from './dto/aggregations/revenue-by-user.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class OrderService {
@@ -76,6 +78,68 @@ export class OrderService {
       { $project: { _id: 0, date: '$_id', totalRevenue: 1 } },
       { $sort: { date: 1 } },
     ]);
+
+    return results;
+  }
+
+  async revenueByUser(): Promise<RevenueByUserResponseDto[]> {
+    const rawResults = await this.orderModel.aggregate([
+      /**
+       * Group
+       * groups by user and sums the totalPrice field from the grouped documents
+       * this is the total revenue per user.
+       * HOWEVER user needs to be populated.
+       */
+      {
+        $group: {
+          _id: '$user',
+          totalRevenue: { $sum: '$totalPrice' },
+        },
+      },
+      /**
+       * AddField
+       * The first stage has returned a plain object in which _id is just a string
+       * therefore the unwind cannot be done directly onto it
+       */
+      {
+        $addFields: {
+          userId: { $toObjectId: '$_id' },
+        },
+      },
+      /**
+       * Lookup (Join)
+       * Joins the users table comparing the added field and the _id field from the user documents
+       * adds the user field which is an array of joined users (in this case i will always find one)
+       */
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      /**
+       * Unwind
+       * Transforms the user array resulting from the join into single objects and attaches them to the result
+       */
+      {
+        $unwind: '$user',
+      },
+      /**
+       * Project (Select)
+       * in this case i remove _id (the key of the grouped results) and user_id (the field i added)
+       * this is done to match the dto result
+       */
+      {
+        $project: {
+          _id: 0,
+          userId: 0,
+        },
+      },
+    ]);
+
+    const results = plainToInstance(RevenueByUserResponseDto, rawResults);
 
     return results;
   }

@@ -14,6 +14,7 @@ import {
   RevenueByDayDto,
   RevenueByDayResponseDto,
 } from './dto/aggregations/revenue-by-day.dto';
+import { RevenueByUserResponseDto } from './dto/aggregations/revenue-by-user.dto';
 
 @Controller('order')
 export class OrderController {
@@ -34,6 +35,11 @@ export class OrderController {
     @Query() revenueByDayDto: RevenueByDayDto,
   ): Promise<RevenueByDayResponseDto[]> {
     return await this.orderService.revenueByDay(revenueByDayDto);
+  }
+
+  @Get('/revenuebyuser')
+  async revenueByUser(): Promise<RevenueByUserResponseDto[]> {
+    return await this.orderService.revenueByUser();
   }
 
   @Get(':id')
