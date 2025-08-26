@@ -11,7 +11,7 @@ import { FindFilterQuery } from './interfaces/find-filter.inerface';
 
 @Injectable()
 export class ProductService {
-  constructor(@InjectModel(Product.name) private productModel: ProductModel) {}
+  constructor(@InjectModel(Product.name) private productModel: ProductModel) { }
 
   async create(
     createProductDto: CreateProductDto,
@@ -83,5 +83,13 @@ export class ProductService {
       .lean();
 
     return ProductResponseDto.fromDocument(product!);
+  }
+
+  async reduceStock(productId: string, orderQuantity: number): Promise<void> {
+    const product = await this.productModel.findById(productId);
+    if (!product) return;
+
+    product.stock = product.stock - orderQuantity;
+    await product.save();
   }
 }

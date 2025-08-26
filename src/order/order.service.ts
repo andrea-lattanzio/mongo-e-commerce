@@ -1,20 +1,44 @@
 import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Order } from './schemas/order.schema';
-import { Model } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 import { OrderResponseDto } from './dto/order-response.dto';
+import { OrderTransactionException } from './exceptions/order-transaction-exception';
+import { ProductService } from 'src/product/product.service';
 
 
 @Injectable()
 export class OrderService {
-  constructor(@InjectModel(Order.name) private orderModel: Model<Order>) { }
+  constructor(
+    @InjectModel(Order.name) private readonly orderModel: Model<Order>,
+    @InjectConnection() private readonly connection: Connection,
+    private readonly productSrv: ProductService,
+  ) { }
 
   async create(createOrderDto: CreateOrderDto) {
-    const order = await this.orderModel.create(createOrderDto);
-    order.toObject();
+    const session = await this.connection.startSession();
+    session.startTransaction();
 
-    return order;
+    try {
+      const order = await this.orderModel.create(createOrderDto);
+      order.toObject();
+
+      /* eslint-disable */
+      for (const orderItem of order.orderItems) {
+        await this.productSrv.reduceStock(
+          orderItem.product.toString(),
+          orderItem.quantity
+        );
+      }
+
+      return order;
+    } catch (error) {
+      await session.abortTransaction();
+      throw new OrderTransactionException(error);
+    } finally {
+      await session.endSession();
+    }
   }
 
   async findAll(): Promise<OrderResponseDto[]> {
