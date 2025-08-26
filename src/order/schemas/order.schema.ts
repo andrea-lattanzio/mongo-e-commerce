@@ -24,7 +24,7 @@ export class Order {
       },
     ],
   })
-  orderItems: { product: ObjectId, quantity: number }[];
+  orderItems: { product: ObjectId; quantity: number }[];
 
   @Prop()
   totalPrice: number;
@@ -48,12 +48,12 @@ OrderSchema.pre('save', async function (next) {
     // );
 
     const productPriceMap = new Map<string, number>();
-    products.forEach(product => {
+    products.forEach((product) => {
       productPriceMap.set(product._id.toString(), product.price);
     });
 
     let total = 0;
-    this.orderItems.forEach(orderItem => {
+    this.orderItems.forEach((orderItem) => {
       const price = productPriceMap.get(orderItem.product.toString());
       if (price) total += price * orderItem.quantity;
     });
