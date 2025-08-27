@@ -51,7 +51,7 @@ export class OrderService {
   async findAll(): Promise<OrderResponseDto[]> {
     const orders = await this.orderModel
       .find()
-      .populate('user')
+      .populate<{ user: UserDocument }>('user')
       .populate<{
         user: UserDocument;
         orderItems: { product: ProductDocument }[];
@@ -151,7 +151,7 @@ export class OrderService {
   async findOne(id: string): Promise<OrderResponseDto> {
     const order = await this.orderModel
       .findById(id)
-      .populate('user')
+      .populate<{ user: UserDocument }>('user')
       .populate<{
         user: UserDocument;
         orderItems: { product: ProductDocument }[];
