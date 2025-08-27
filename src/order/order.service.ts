@@ -12,6 +12,8 @@ import {
 } from './dto/aggregations/revenue-by-day.dto';
 import { RevenueByUserResponseDto } from './dto/aggregations/revenue-by-user.dto';
 import { plainToInstance } from 'class-transformer';
+import { UserDocument } from 'src/user/schemas/user.schema';
+import { ProductDocument } from 'src/product/schemas/product.schema';
 
 @Injectable()
 export class OrderService {
@@ -19,7 +21,7 @@ export class OrderService {
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
     @InjectConnection() private readonly connection: Connection,
     private readonly productSrv: ProductService,
-  ) {}
+  ) { }
 
   async create(createOrderDto: CreateOrderDto) {
     const session = await this.connection.startSession();
@@ -50,13 +52,15 @@ export class OrderService {
     const orders = await this.orderModel
       .find()
       .populate('user')
-      .populate({
+      .populate<{
+        user: UserDocument;
+        orderItems: { product: ProductDocument }[];
+      }>({
         path: 'orderItems',
-        populate: {
-          path: 'product',
-        },
+        populate: { path: 'product' },
       })
       .lean();
+
 
     return OrderResponseDto.fromDocuments(orders);
   }
@@ -148,13 +152,13 @@ export class OrderService {
     const order = await this.orderModel
       .findById(id)
       .populate('user')
-      .populate({
+      .populate<{
+        user: UserDocument;
+        orderItems: { product: ProductDocument }[];
+      }>({
         path: 'orderItems',
-        populate: {
-          path: 'product',
-        },
-      })
-      .lean();
+        populate: { path: 'product' },
+      }).lean();
 
     return OrderResponseDto.fromDocument(order!);
   }
