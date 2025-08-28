@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
-
-import { plainToInstance } from 'class-transformer';
 import { UserDocument } from 'src/user/schemas/user.schema';
 import { ProductDocument } from 'src/product/schemas/product.schema';
 import { Order } from '../schemas/order.schema';
@@ -12,6 +10,7 @@ import { RevenueByUserResponseDto } from '../dto/aggregations/revenue-by-user.dt
 import { CreateOrderDto } from '../dto/create-order.dto';
 import { OrderResponseDto } from '../dto/order-response.dto';
 import { OrderTransactionException } from '../exceptions/order-transaction-exception';
+import { OrderAggregationService } from './order.aggregation.service';
 
 @Injectable()
 export class OrderService {
@@ -19,6 +18,7 @@ export class OrderService {
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
     @InjectConnection() private readonly connection: Connection,
     private readonly productSrv: ProductService,
+    private readonly orderAggregationSrv: OrderAggregationService,
   ) { }
 
   async create(createOrderDto: CreateOrderDto) {
@@ -65,82 +65,15 @@ export class OrderService {
   async revenueByDay(
     revenueByDayDto: RevenueByDayDto,
   ): Promise<RevenueByDayResponseDto[]> {
-    const startDate = new Date(revenueByDayDto.startDate);
-    const endDate = new Date(revenueByDayDto.endDate);
+    const { startDate, endDate } = revenueByDayDto;
 
-    const results = await this.orderModel.aggregate<RevenueByDayResponseDto>([
-      { $match: { createdAt: { $gte: startDate, $lte: endDate } } },
-      {
-        $group: {
-          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-          totalRevenue: { $sum: '$totalPrice' },
-        },
-      },
-      { $project: { _id: 0, date: '$_id', totalRevenue: 1 } },
-      { $sort: { date: 1 } },
-    ]);
+    const results = await this.orderAggregationSrv.revenueByDayAggregation(startDate, endDate);
 
     return results;
   }
 
   async revenueByUser(): Promise<RevenueByUserResponseDto[]> {
-    const rawResults = await this.orderModel.aggregate([
-      /**
-       * Group
-       * groups by user and sums the totalPrice field from the grouped documents
-       * this is the total revenue per user.
-       * HOWEVER user needs to be populated.
-       */
-      {
-        $group: {
-          _id: '$user',
-          totalRevenue: { $sum: '$totalPrice' },
-        },
-      },
-      /**
-       * AddField
-       * The first stage has returned a plain object in which _id is just a string
-       * therefore the unwind cannot be done directly onto it
-       */
-      {
-        $addFields: {
-          userId: { $toObjectId: '$_id' },
-        },
-      },
-      /**
-       * Lookup (Join)
-       * Joins the users table comparing the added field and the _id field from the user documents
-       * adds the user field which is an array of joined users (in this case i will always find one)
-       */
-      {
-        $lookup: {
-          from: 'users',
-          localField: 'userId',
-          foreignField: '_id',
-          as: 'user',
-        },
-      },
-      /**
-       * Unwind
-       * Transforms the user array resulting from the join into single objects and attaches them to the result
-       */
-      {
-        $unwind: '$user',
-      },
-      /**
-       * Project (Select)
-       * in this case i remove _id (the key of the grouped results) and user_id (the field i added)
-       * this is done to match the dto result
-       */
-      {
-        $project: {
-          _id: 0,
-          userId: 0,
-        },
-      },
-    ]);
-
-    const results = plainToInstance(RevenueByUserResponseDto, rawResults);
+    const results = await this.orderAggregationSrv.revenueByUser();
 
     return results;
   }
