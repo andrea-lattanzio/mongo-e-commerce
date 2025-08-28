@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { ProductResponseDto } from './dto/product-response.dto';
+import { ProductResponseDto } from '../dto/product-response.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Product, ProductModel } from './schemas/product.schema';
-import { FindByNameQueryDto } from './dto/query/find-by-name.dto';
-import { FindByCategoryDto } from './dto/query/find-by-category.dto';
-import { FindFilterDto } from './dto/query/find-filter.dto';
-import { FindFilterQuery } from './interfaces/find-filter.inerface';
+import { CreateProductDto } from '../dto/create-product.dto';
+import { FindByCategoryDto } from '../dto/query/find-by-category.dto';
+import { FindByNameQueryDto } from '../dto/query/find-by-name.dto';
+import { FindFilterDto } from '../dto/query/find-filter.dto';
+import { UpdateProductDto } from '../dto/update-product.dto';
+import { FindFilterQuery } from '../interfaces/find-filter.interface';
+import { Product, ProductModel } from '../schemas/product.schema';
+
 
 @Injectable()
 export class ProductService {

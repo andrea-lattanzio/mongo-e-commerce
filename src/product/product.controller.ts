@@ -8,16 +8,16 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
-import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FindByNameQueryDto } from './dto/query/find-by-name.dto';
 import { FindByCategoryDto } from './dto/query/find-by-category.dto';
 import { FindFilterDto } from './dto/query/find-filter.dto';
+import { ProductService } from './services/product.service';
 
 @Controller('product')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(private readonly productService: ProductService) { }
 
   @Post()
   async create(@Body() createProductDto: CreateProductDto) {

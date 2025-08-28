@@ -1,19 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Order } from './schemas/order.schema';
 import { Connection, Model } from 'mongoose';
-import { OrderResponseDto } from './dto/order-response.dto';
-import { OrderTransactionException } from './exceptions/order-transaction-exception';
-import { ProductService } from 'src/product/product.service';
-import {
-  RevenueByDayDto,
-  RevenueByDayResponseDto,
-} from './dto/aggregations/revenue-by-day.dto';
-import { RevenueByUserResponseDto } from './dto/aggregations/revenue-by-user.dto';
+
 import { plainToInstance } from 'class-transformer';
 import { UserDocument } from 'src/user/schemas/user.schema';
 import { ProductDocument } from 'src/product/schemas/product.schema';
+import { Order } from '../schemas/order.schema';
+import { ProductService } from 'src/product/services/product.service';
+import { RevenueByDayDto, RevenueByDayResponseDto } from '../dto/aggregations/revenue-by-day.dto';
+import { RevenueByUserResponseDto } from '../dto/aggregations/revenue-by-user.dto';
+import { CreateOrderDto } from '../dto/create-order.dto';
+import { OrderResponseDto } from '../dto/order-response.dto';
+import { OrderTransactionException } from '../exceptions/order-transaction-exception';
 
 @Injectable()
 export class OrderService {
