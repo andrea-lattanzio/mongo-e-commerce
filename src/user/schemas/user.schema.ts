@@ -49,7 +49,6 @@ UserSchema.set('toObject', {
 
 // schema middlewares to handle
 // schema lifecycle, in this case hashing password when inserting and updating
-/* eslint-disable */
 UserSchema.pre('save', async function (next) {
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(this.password, 10);

@@ -32,7 +32,6 @@ export class Order {
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
 
-/* eslint-disable */
 OrderSchema.pre('save', async function (next) {
   if (this.isModified('orderItems')) {
     const productModel = this.model('Product');

@@ -43,9 +43,9 @@ export class ProductService {
   }
 
   async findOne(id: string): Promise<ProductResponseDto> {
-    const product = await this.productModel.findById(id).lean();
+    const product = await this.productModel.findById(id).orFail().lean();
 
-    return ProductResponseDto.fromDocument(product!);
+    return ProductResponseDto.fromDocument(product);
   }
 
   async findByName(
@@ -54,7 +54,7 @@ export class ProductService {
     const { name } = findByNameQueryDto;
     const product = await this.productModel.findByName(name);
 
-    return ProductResponseDto.fromDocuments(product!);
+    return ProductResponseDto.fromDocuments(product);
   }
 
   async findByCategory(
@@ -63,7 +63,7 @@ export class ProductService {
     const { category } = findByCategoryDto;
     const product = await this.productModel.findByCategory(category);
 
-    return ProductResponseDto.fromDocuments(product!);
+    return ProductResponseDto.fromDocuments(product);
   }
 
   async update(
@@ -72,21 +72,23 @@ export class ProductService {
   ): Promise<ProductResponseDto> {
     const product = await this.productModel
       .findOneAndUpdate({ _id: id }, { $set: updateProductDto }, { new: true })
+      .orFail()
       .lean();
 
-    return ProductResponseDto.fromDocument(product!);
+    return ProductResponseDto.fromDocument(product);
   }
 
   async remove(id: string): Promise<ProductResponseDto> {
     const product = await this.productModel
       .findByIdAndDelete({ _id: id })
+      .orFail()
       .lean();
 
-    return ProductResponseDto.fromDocument(product!);
+    return ProductResponseDto.fromDocument(product);
   }
 
   async reduceStock(productId: string, orderQuantity: number): Promise<void> {
-    const product = await this.productModel.findById(productId);
+    const product = await this.productModel.findById(productId).orFail();
     if (!product) return;
 
     product.stock = product.stock - orderQuantity;

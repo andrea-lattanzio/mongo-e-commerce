@@ -1,3 +1,4 @@
+import { Transform } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
@@ -36,5 +37,6 @@ export class FindFilterDto {
   @ArrayNotEmpty()
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
+  @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   categories: string[];
 }

@@ -4,9 +4,8 @@ import {
   ValidationOptions,
 } from 'class-validator';
 
-/* eslint-disable */
 export function IsBefore(property: string, options?: ValidationOptions) {
-  return function (object: Object, propertyName: string) {
+  return function (object: object, propertyName: string) {
     registerDecorator({
       name: 'IsBefore',
       target: object.constructor,

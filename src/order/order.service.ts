@@ -31,7 +31,6 @@ export class OrderService {
       const order = await this.orderModel.create(createOrderDto);
       order.toObject();
 
-      /* eslint-disable */
       for (const orderItem of order.orderItems) {
         await this.productSrv.reduceStock(
           orderItem.product.toString(),
@@ -151,6 +150,7 @@ export class OrderService {
   async findOne(id: string): Promise<OrderResponseDto> {
     const order = await this.orderModel
       .findById(id)
+      .orFail()
       .populate<{ user: UserDocument }>('user')
       .populate<{
         user: UserDocument;
@@ -164,8 +164,8 @@ export class OrderService {
   }
 
   async remove(id: string) {
-    const order = await this.orderModel.findByIdAndDelete(id).lean();
+    const order = await this.orderModel.findByIdAndDelete(id).orFail().lean();
 
-    return OrderResponseDto.fromDocument(order!);
+    return OrderResponseDto.fromDocument(order);
   }
 }
