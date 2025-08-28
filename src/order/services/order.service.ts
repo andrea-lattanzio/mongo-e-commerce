@@ -48,6 +48,7 @@ export class OrderService {
   async findAll(): Promise<OrderResponseDto[]> {
     const orders = await this.orderModel
       .find()
+      .sort({ createdAt: -1 })
       .populate<{ user: UserDocument }>('user')
       .populate<{
         user: UserDocument;

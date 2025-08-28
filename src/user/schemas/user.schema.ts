@@ -37,6 +37,8 @@ export class User {
 // schema will later be injected in the user module to get the model object
 export const UserSchema = SchemaFactory.createForClass(User);
 
+UserSchema.index({ email: 1 }); // improves findByEmail search
+
 // add virtual property for full name
 // virtual properties are NOT included by default
 UserSchema.virtual('fullName').get(function () {

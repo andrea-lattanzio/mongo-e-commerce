@@ -32,6 +32,9 @@ export class Order {
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
 
+OrderSchema.index({ createdAt: -1 }); // improves sorting in order list
+OrderSchema.index({ user: 1, createdAt: -1 }); // improves user order list 
+
 OrderSchema.pre('save', async function (next) {
   if (this.isModified('orderItems')) {
     const productModel = this.model('Product');
