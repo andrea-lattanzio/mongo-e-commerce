@@ -12,10 +12,6 @@ export class Order {
   @Prop({ type: Types.ObjectId, ref: 'User' })
   user: ObjectId;
 
-  // product can only be selected once
-  // @Prop({ type: [Types.ObjectId], ref: 'Product' })
-  // products: ObjectId[];
-
   @Prop({
     type: [
       {
@@ -32,8 +28,7 @@ export class Order {
 
 export const OrderSchema = SchemaFactory.createForClass(Order);
 
-OrderSchema.index({ createdAt: -1 }); // improves sorting in order list
-OrderSchema.index({ user: 1, createdAt: -1 }); // improves user order list 
+OrderSchema.index({ user: 1 }); // improves user order list 
 
 OrderSchema.pre('save', async function (next) {
   if (this.isModified('orderItems')) {
@@ -42,12 +37,6 @@ OrderSchema.pre('save', async function (next) {
     const products: ProductDocument[] = await productModel.find({
       _id: { $in: productIds },
     });
-
-    // total price for single selection of products
-    // const totalPrice = products.reduce(
-    //   (sum, product) => sum + product.price,
-    //   0,
-    // );
 
     const productPriceMap = new Map<string, number>();
     products.forEach((product) => {

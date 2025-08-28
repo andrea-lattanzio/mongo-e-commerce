@@ -63,6 +63,22 @@ export class OrderService {
     return OrderResponseDto.fromDocuments(orders);
   }
 
+  async findAllUserOrders(userId: string): Promise<OrderResponseDto[]> {
+    const userOrders = await this.orderModel
+      .find({ user: userId })
+      .sort({ createdAt: -1 })
+      .populate<{
+        user: UserDocument;
+        orderItems: { product: ProductDocument }[];
+      }>({
+        path: 'orderItems',
+        populate: { path: 'product' },
+      })
+      .lean();
+
+    return OrderResponseDto.fromDocuments(userOrders);
+  }
+
   async revenueByDay(
     revenueByDayDto: RevenueByDayDto,
   ): Promise<RevenueByDayResponseDto[]> {

@@ -18,7 +18,7 @@ import { OrderService } from './services/order.service';
 
 @Controller('order')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(private readonly orderService: OrderService) { }
 
   @Post()
   async create(@Body() createOrderDto: CreateOrderDto) {
@@ -28,6 +28,11 @@ export class OrderController {
   @Get()
   async findAll(): Promise<OrderResponseDto[]> {
     return await this.orderService.findAll();
+  }
+
+  @Get('/userorders/:id')
+  async findAllUserOrders(@Param('id') id: string): Promise<OrderResponseDto[]> {
+    return await this.orderService.findAllUserOrders(id);
   }
 
   @Get('/revenuebyday')
