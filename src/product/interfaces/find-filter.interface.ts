@@ -1,5 +1,5 @@
 export type FindFilterQuery = {
-  name?: { $regex: string; $options: string };
+  $text?: { $search: string };
   price?: { $gte?: number; $lte?: number };
   stock?: number;
   categories?: { $in: string[] };

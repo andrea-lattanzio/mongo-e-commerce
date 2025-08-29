@@ -27,7 +27,7 @@ export class ProductService {
     const { name, minPrice, maxPrice, stock, categories } = findFilterDto;
     const query: FindFilterQuery = {};
 
-    if (name) query.name = { $regex: '^' + name, $options: 'i' };
+    if (name) query.$text = { $search: name };
     if (minPrice && maxPrice) {
       query.price = { $gte: minPrice, $lte: maxPrice };
     } else if (minPrice) {
