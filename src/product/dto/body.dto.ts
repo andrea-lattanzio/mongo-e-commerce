@@ -1,7 +1,7 @@
 import { IsString, IsNotEmpty, IsNumber, Min, IsArray, ArrayNotEmpty } from "class-validator";
 import { ProductDocument } from "../schemas/product.schema";
-import { plainToInstance } from "class-transformer";
 import { PartialType } from "@nestjs/mapped-types";
+import { Type } from "class-transformer";
 
 
 export class CreateProductDto {
@@ -32,6 +32,7 @@ export class UpdateProductDto extends PartialType(CreateProductDto) { }
 
 
 export class ProductResponseDto {
+  @Type(() => String)
   _id: string;
   name: string;
   description: string;
@@ -39,11 +40,11 @@ export class ProductResponseDto {
   stock: number;
   categories: string[];
 
-  static fromDocument(documentObject: ProductDocument): ProductResponseDto {
-    return plainToInstance(ProductResponseDto, documentObject);
+  constructor(partial: Partial<ProductDocument>) {
+    Object.assign(this, partial);
   }
 
-  static fromDocuments(documents: ProductDocument[]): ProductResponseDto[] {
-    return documents.map((doc) => this.fromDocument(doc));
+  static fromArray(productDocuments: ProductDocument[]): ProductResponseDto[] {
+    return productDocuments.map((productDoc) => new ProductResponseDto(productDoc));
   }
 }

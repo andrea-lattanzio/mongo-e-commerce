@@ -17,7 +17,7 @@ export class ProductService {
     const product = await this.productModel.create(createProductDto);
     const productObject = product.toObject();
 
-    return ProductResponseDto.fromDocument(productObject);
+    return new ProductResponseDto(productObject);
   }
 
   async findAll(findFilterDto: FindFilterDto): Promise<ProductResponseDto[]> {
@@ -37,31 +37,31 @@ export class ProductService {
 
     const products = await this.productModel.find(query).lean();
 
-    return ProductResponseDto.fromDocuments(products);
+    return ProductResponseDto.fromArray(products);
   }
 
   async findOne(id: string): Promise<ProductResponseDto> {
     const product = await this.productModel.findById(id).orFail().lean();
 
-    return ProductResponseDto.fromDocument(product);
+    return new ProductResponseDto(product);
   }
 
   async findByName(
     findByNameQueryDto: FindByNameQueryDto,
   ): Promise<ProductResponseDto[]> {
     const { name } = findByNameQueryDto;
-    const product = await this.productModel.findByName(name);
+    const products = await this.productModel.findByName(name);
 
-    return ProductResponseDto.fromDocuments(product);
+    return ProductResponseDto.fromArray(products);
   }
 
   async findByCategory(
     findByCategoryDto: FindByCategoryDto,
   ): Promise<ProductResponseDto[]> {
     const { category } = findByCategoryDto;
-    const product = await this.productModel.findByCategory(category);
+    const products = await this.productModel.findByCategory(category);
 
-    return ProductResponseDto.fromDocuments(product);
+    return ProductResponseDto.fromArray(products);
   }
 
   async findByIds(
@@ -81,7 +81,7 @@ export class ProductService {
       .orFail()
       .lean();
 
-    return ProductResponseDto.fromDocument(product);
+    return new ProductResponseDto(product);
   }
 
   async remove(id: string): Promise<ProductResponseDto> {
@@ -90,7 +90,7 @@ export class ProductService {
       .orFail()
       .lean();
 
-    return ProductResponseDto.fromDocument(product);
+    return new ProductResponseDto(product);
   }
 
   async reduceStock(productId: string, orderQuantity: number): Promise<void> {
