@@ -1,7 +1,7 @@
 import { IsString, IsNotEmpty, IsEmail, IsOptional, IsEnum } from "class-validator";
 import { UserDocument, UserRole } from "../schemas/user.schema";
 import { PartialType } from "@nestjs/mapped-types";
-import { Exclude, plainToInstance } from "class-transformer";
+import { Exclude, plainToInstance, Type } from "class-transformer";
 
 
 export class CreateUserDto {
@@ -30,6 +30,7 @@ export class CreateUserDto {
 export class UpdateUserDto extends PartialType(CreateUserDto) { }
 
 export class UserResponseDto {
+  @Type(() => String)
   _id: string;
   firstName: string;
   lastName: string;
@@ -40,11 +41,11 @@ export class UserResponseDto {
   @Exclude()
   password: string;
 
-  static fromDocument(documentObject: UserDocument): UserResponseDto {
-    return plainToInstance(UserResponseDto, documentObject);
+  constructor(partial: UserDocument) {
+    Object.assign(this, partial);
   }
 
-  static fromDocuments(documents: UserDocument[]): UserResponseDto[] {
-    return documents.map((doc) => this.fromDocument(doc));
+  static fromArray(userDocuments: UserDocument[]): UserResponseDto[] {
+    return userDocuments.map((userDoc) => new UserResponseDto(userDoc));
   }
 }
