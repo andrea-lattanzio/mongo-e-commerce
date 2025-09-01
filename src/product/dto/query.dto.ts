@@ -1,14 +1,17 @@
+import { IsString, IsNotEmpty, IsOptional, IsNumber, Min, IsInt, IsArray, ArrayNotEmpty } from "class-validator";
 import { Transform } from 'class-transformer';
-import {
-  ArrayNotEmpty,
-  IsArray,
-  IsInt,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Min,
-} from 'class-validator';
+
+export class FindByCategoryDto {
+  @IsString()
+  @IsNotEmpty()
+  category: string;
+}
+
+export class FindByNameQueryDto {
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+}
 
 export class FindFilterDto {
   @IsOptional()

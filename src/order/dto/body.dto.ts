@@ -1,6 +1,6 @@
 import { plainToInstance, Type } from "class-transformer";
 import { ArrayNotEmpty, IsArray, IsInt, IsMongoId, Min, ValidateNested } from "class-validator";
-import { ProductResponseDto } from "src/product/dto/product-response.dto";
+import { ProductResponseDto } from "src/product/dto/body.dto";
 import { UserResponseDto } from "src/user/dto/user-response.dto";
 
 

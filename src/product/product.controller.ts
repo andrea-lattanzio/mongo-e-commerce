@@ -8,12 +8,9 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { FindByNameQueryDto } from './dto/query/find-by-name.dto';
-import { FindByCategoryDto } from './dto/query/find-by-category.dto';
-import { FindFilterDto } from './dto/query/find-filter.dto';
 import { ProductService } from './services/product.service';
+import { CreateProductDto, UpdateProductDto } from './dto/body.dto';
+import { FindByCategoryDto, FindByNameQueryDto, FindFilterDto } from './dto/query.dto';
 
 @Controller('product')
 export class ProductController {
