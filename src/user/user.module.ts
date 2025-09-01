@@ -4,13 +4,25 @@ import { UserController } from './user.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './schemas/user.schema';
 import { UserService } from './services/user.service';
+import { Schema } from 'mongoose';
+import { hashPassword } from './schemas/user.hooks';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), // registering the new collection
+    MongooseModule.forFeatureAsync([
+      {
+        name: User.name,
+        useFactory: () => {
+          const schema: Schema = UserSchema;
+          schema.pre('save', hashPassword());
+          schema.pre('findOneAndUpdate', hashPassword());
+
+          return schema;
+        }
+      }
+    ]),
   ],
   controllers: [UserController],
   providers: [UserService],
-  exports: [MongooseModule], // only needed if user model needs to be used in other modules
 })
 export class UserModule { }

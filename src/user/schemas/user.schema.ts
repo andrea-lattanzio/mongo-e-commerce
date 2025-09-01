@@ -51,22 +51,25 @@ UserSchema.set('toObject', {
 
 // schema middlewares to handle
 // schema lifecycle, in this case hashing password when inserting and updating
-UserSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
+// REFACTOR:
+// schema hooks can be defined in the module declaration, when importing mongoose module
+// this follows the NestJS way allowing dependency injection inside of hooks
+// UserSchema.pre('save', async function (next) {
+//   if (this.isModified('password')) {
+//     this.password = await bcrypt.hash(this.password, 10);
+//   }
 
-  next();
-});
+//   next();
+// });
 
-UserSchema.pre('findOneAndUpdate', function (next) {
-  const update = this.getUpdate() as UpdateQuery<User>;
-  if (update && update.$set && update.$set.password) {
-    update.$set.password = bcrypt.hashSync(update.$set.password, 10);
-  }
+// UserSchema.pre('findOneAndUpdate', function (next) {
+//   const update = this.getUpdate() as UpdateQuery<User>;
+//   if (update && update.$set && update.$set.password) {
+//     update.$set.password = bcrypt.hashSync(update.$set.password, 10);
+//   }
 
-  next();
-});
+//   next();
+// });
 
 // static method callable on the UserModel object to find one by email
 UserSchema.statics.findByEmail = function (email: string) {
