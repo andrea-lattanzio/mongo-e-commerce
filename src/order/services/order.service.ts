@@ -5,12 +5,10 @@ import { UserDocument } from 'src/user/schemas/user.schema';
 import { ProductDocument } from 'src/product/schemas/product.schema';
 import { Order } from '../schemas/order.schema';
 import { ProductService } from 'src/product/services/product.service';
-import { RevenueByDayDto, RevenueByDayResponseDto } from '../dto/aggregations/revenue-by-day.dto';
-import { RevenueByUserResponseDto } from '../dto/aggregations/revenue-by-user.dto';
-import { CreateOrderDto } from '../dto/create-order.dto';
-import { OrderResponseDto } from '../dto/order-response.dto';
 import { OrderTransactionException } from '../exceptions/order-transaction-exception';
 import { OrderAggregationService } from './order.aggregation.service';
+import { RevenueByDayDto } from '../dto/query.dto';
+import { CreateOrderDto, OrderResponseDto, RevenueByDayResponseDto, RevenueByUserResponseDto } from '../dto/body.dto';
 
 @Injectable()
 export class OrderService {
@@ -108,7 +106,7 @@ export class OrderService {
         populate: { path: 'product' },
       }).lean();
 
-    return OrderResponseDto.fromDocument(order!);
+    return OrderResponseDto.fromDocument(order);
   }
 
   async remove(id: string) {

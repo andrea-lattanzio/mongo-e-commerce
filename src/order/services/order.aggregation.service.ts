@@ -2,9 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Order } from "../schemas/order.schema";
 import { Model } from "mongoose";
-import { RevenueByDayResponseDto } from "../dto/aggregations/revenue-by-day.dto";
-import { RevenueByUserResponseDto } from "../dto/aggregations/revenue-by-user.dto";
 import { plainToInstance } from "class-transformer";
+import { RevenueByDayResponseDto, RevenueByUserResponseDto } from "../dto/body.dto";
 
 /**
  * REMINDER: Aggregations return plain javascript objects, not documents
