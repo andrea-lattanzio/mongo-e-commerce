@@ -30,27 +30,28 @@ export const OrderSchema = SchemaFactory.createForClass(Order);
 
 OrderSchema.index({ user: 1 }); // improves user order list 
 
-OrderSchema.pre('save', async function (next) {
-  if (this.isModified('orderItems')) {
-    const productModel = this.model('Product');
-    const productIds = this.orderItems.map((orderItem) => orderItem.product);
-    const products: ProductDocument[] = await productModel.find({
-      _id: { $in: productIds },
-    });
+// This hook is now defined in order.module.ts
+// OrderSchema.pre('save', async function (next) {
+//   if (this.isModified('orderItems')) {
+//     const productModel = this.model('Product');
+//     const productIds = this.orderItems.map((orderItem) => orderItem.product);
+//     const products: ProductDocument[] = await productModel.find({
+//       _id: { $in: productIds },
+//     });
 
-    const productPriceMap = new Map<string, number>();
-    products.forEach((product) => {
-      productPriceMap.set(product._id.toString(), product.price);
-    });
+//     const productPriceMap = new Map<string, number>();
+//     products.forEach((product) => {
+//       productPriceMap.set(product._id.toString(), product.price);
+//     });
 
-    let total = 0;
-    this.orderItems.forEach((orderItem) => {
-      const price = productPriceMap.get(orderItem.product.toString());
-      if (price) total += price * orderItem.quantity;
-    });
+//     let total = 0;
+//     this.orderItems.forEach((orderItem) => {
+//       const price = productPriceMap.get(orderItem.product.toString());
+//       if (price) total += price * orderItem.quantity;
+//     });
 
-    this.totalPrice = total;
-  }
+//     this.totalPrice = total;
+//   }
 
-  next();
-});
+//   next();
+// });

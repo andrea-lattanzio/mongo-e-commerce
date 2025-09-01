@@ -7,7 +7,7 @@ import { FindByNameQueryDto } from '../dto/query/find-by-name.dto';
 import { FindFilterDto } from '../dto/query/find-filter.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { FindFilterQuery } from '../interfaces/find-filter.interface';
-import { Product, ProductModel } from '../schemas/product.schema';
+import { Product, ProductDocument, ProductModel } from '../schemas/product.schema';
 
 
 @Injectable()
@@ -65,6 +65,14 @@ export class ProductService {
     const product = await this.productModel.findByCategory(category);
 
     return ProductResponseDto.fromDocuments(product);
+  }
+
+  async findByIds(
+    ids: string[],
+  ): Promise<ProductDocument[]> {
+    const products = await this.productModel.find({ _id: { $in: ids } }).lean();
+
+    return products;
   }
 
   async update(
