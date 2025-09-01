@@ -15,6 +15,7 @@ export interface UserModel extends Model<UserDocument> {
 @Schema({
   timestamps: true, // createdAt, updatedAT
   versionKey: false, // removes __v
+  virtuals: true,
 })
 export class User {
   @Prop()
@@ -42,10 +43,6 @@ UserSchema.index({ email: 1 }); // improves findByEmail search
 // virtual properties are NOT included by default
 UserSchema.virtual('fullName').get(function () {
   return `${this.firstName} ${this.lastName}`;
-});
-
-UserSchema.set('toObject', {
-  virtuals: true,
 });
 
 // schema middlewares to handle
