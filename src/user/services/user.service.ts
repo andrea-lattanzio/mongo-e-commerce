@@ -13,19 +13,19 @@ export class UserService {
     const user = await this.userModel.create(createUserDto);
     const userPlainObject = user.toObject();
 
-    return UserResponseDto.fromDocument(userPlainObject);
+    return new UserResponseDto(userPlainObject);
   }
 
   async findAll(): Promise<UserResponseDto[]> {
     const users = await this.userModel.find().lean();
 
-    return UserResponseDto.fromDocuments(users);
+    return UserResponseDto.fromArray(users);
   }
 
   async findOne(id: string) {
     const user = await this.userModel.findById(id).orFail().lean();
 
-    return UserResponseDto.fromDocument(user);
+    return new UserResponseDto(user);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -34,7 +34,7 @@ export class UserService {
       .orFail()
       .lean();
 
-    return UserResponseDto.fromDocument(user);
+    return new UserResponseDto(user);
   }
 
   async remove(id: string) {
@@ -42,6 +42,6 @@ export class UserService {
       .orFail()
       .lean();
 
-    return UserResponseDto.fromDocument(user);
+    return new UserResponseDto(user);
   }
 }

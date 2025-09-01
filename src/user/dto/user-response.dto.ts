@@ -1,7 +1,8 @@
-import { Exclude, plainToInstance } from 'class-transformer';
+import { Exclude, Type } from 'class-transformer';
 import { UserDocument } from '../schemas/user.schema';
 
 export class UserResponseDto {
+  @Type(() => String)
   _id: string;
   firstName: string;
   lastName: string;
@@ -12,11 +13,11 @@ export class UserResponseDto {
   @Exclude()
   password: string;
 
-  static fromDocument(documentObject: UserDocument): UserResponseDto {
-    return plainToInstance(UserResponseDto, documentObject);
+  constructor(partial: UserDocument) {
+    Object.assign(this, partial);
   }
 
-  static fromDocuments(documents: UserDocument[]): UserResponseDto[] {
-    return documents.map((doc) => this.fromDocument(doc));
+  static fromArray(userDocuments: UserDocument[]): UserResponseDto[] {
+    return userDocuments.map((userDoc) => new UserResponseDto(userDoc));
   }
 }
