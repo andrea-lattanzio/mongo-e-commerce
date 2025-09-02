@@ -11,7 +11,7 @@ import { OrderService } from './services/order.service';
 import { RevenueByDayDto } from './dto/query.dto';
 import { CreateOrderDto, OrderResponseDto, RevenueByDayResponseDto, RevenueByUserResponseDto } from './dto/body.dto';
 
-@Controller('order')
+@Controller('orders')
 export class OrderController {
   constructor(private readonly orderService: OrderService) { }
 

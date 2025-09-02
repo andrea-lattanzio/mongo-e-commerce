@@ -12,7 +12,7 @@ import { ProductService } from './services/product.service';
 import { CreateProductDto, UpdateProductDto } from './dto/body.dto';
 import { FindByCategoryDto, FindByNameQueryDto, FindFilterDto } from './dto/query.dto';
 
-@Controller('product')
+@Controller('products')
 export class ProductController {
   constructor(private readonly productService: ProductService) { }
 
