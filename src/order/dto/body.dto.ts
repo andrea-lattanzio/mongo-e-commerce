@@ -1,7 +1,9 @@
-import { plainToInstance, Type } from "class-transformer";
+import { Type } from "class-transformer";
 import { ArrayNotEmpty, IsArray, IsInt, IsMongoId, Min, ValidateNested } from "class-validator";
+import { PopulatedDoc } from "mongoose";
 import { ProductResponseDto } from "src/product/dto/body.dto";
 import { UserResponseDto } from "src/user/dto/body.dto";
+import { OrderDocument } from "../schemas/order.schema";
 
 
 export class RevenueByDayResponseDto {
@@ -35,11 +37,15 @@ export class CreateOrderDto {
 }
 
 export class OrderItemsResponseDto {
+  @Type(() => String)
+  _id: string;
+  @Type(() => ProductResponseDto)
   product: ProductResponseDto;
   quantity: number;
 }
 
 export class OrderResponseDto {
+  @Type(() => String)
   _id: string;
   @Type(() => UserResponseDto)
   user: UserResponseDto;
@@ -47,11 +53,11 @@ export class OrderResponseDto {
   orderItems: OrderItemsResponseDto[]
   totalPrice: number;
 
-  static fromDocument(order: any): OrderResponseDto {
-    return plainToInstance(OrderResponseDto, order);
+  constructor(partial: Partial<PopulatedDoc<OrderDocument>> | Partial<OrderDocument>) {
+    Object.assign(this, partial);
   }
 
-  static fromDocuments(orders: any[]): OrderResponseDto[] {
-    return orders.map((doc) => this.fromDocument(doc));
+  static fromArray(productDocuments: Partial<PopulatedDoc<OrderDocument>>[]): OrderResponseDto[] {
+    return productDocuments.map((productDoc) => new OrderResponseDto(productDoc));
   }
 }

@@ -38,6 +38,9 @@ export class UserResponseDto {
   email: string;
   role: string;
 
+  @Exclude()
+  password: string;
+
   constructor(partial: Partial<UserDocument>) {
     Object.assign(this, partial);
   }

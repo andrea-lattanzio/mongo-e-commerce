@@ -25,7 +25,6 @@ export class OrderService {
 
     try {
       const order = await this.orderModel.create(createOrderDto);
-      order.toObject();
 
       for (const orderItem of order.orderItems) {
         await this.productSrv.reduceStock(
@@ -34,7 +33,7 @@ export class OrderService {
         );
       }
 
-      return order;
+      return order.toObject();
     } catch (error) {
       await session.abortTransaction();
       throw new OrderTransactionException(error);
@@ -47,34 +46,33 @@ export class OrderService {
     const orders = await this.orderModel
       .find()
       .sort({ createdAt: -1 })
+      // populate user property
       .populate<{ user: UserDocument }>('user')
-      .populate<{
-        user: UserDocument;
-        orderItems: { product: ProductDocument }[];
-      }>({
+      // populate subdocuments orderItems.porduct, lean property needed even with .lean() 
+      .populate<{ orderItems: { product: ProductDocument }[] }>({
         path: 'orderItems',
-        populate: { path: 'product' },
+        populate: { path: 'product', options: { lean: true } },
       })
       .lean();
 
 
-    return OrderResponseDto.fromDocuments(orders);
+    return OrderResponseDto.fromArray(orders);
   }
 
   async findAllUserOrders(userId: string): Promise<OrderResponseDto[]> {
     const userOrders = await this.orderModel
       .find({ user: userId })
       .sort({ createdAt: -1 })
-      .populate<{
-        user: UserDocument;
-        orderItems: { product: ProductDocument }[];
-      }>({
+      // populate user property
+      .populate<{ user: UserDocument }>('user')
+      // populate subdocuments orderItems.porduct, lean property needed even with .lean() 
+      .populate<{ orderItems: { product: ProductDocument }[] }>({
         path: 'orderItems',
-        populate: { path: 'product' },
+        populate: { path: 'product', options: { lean: true } },
       })
       .lean();
 
-    return OrderResponseDto.fromDocuments(userOrders);
+    return OrderResponseDto.fromArray(userOrders);
   }
 
   async revenueByDay(
@@ -103,15 +101,15 @@ export class OrderService {
         orderItems: { product: ProductDocument }[];
       }>({
         path: 'orderItems',
-        populate: { path: 'product' },
+        populate: { path: 'product', options: { lean: true } },
       }).lean();
 
-    return OrderResponseDto.fromDocument(order);
+    return new OrderResponseDto(order);
   }
 
   async remove(id: string) {
     const order = await this.orderModel.findByIdAndDelete(id).orFail().lean();
 
-    return OrderResponseDto.fromDocument(order);
+    return new OrderResponseDto(order);
   }
 }

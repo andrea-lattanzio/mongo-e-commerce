@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, ObjectId, Types } from 'mongoose';
-import { ProductDocument } from 'src/product/schemas/product.schema';
 
 export type OrderDocument = HydratedDocument<Order>;
 
@@ -12,6 +11,9 @@ export class Order {
   @Prop({ type: Types.ObjectId, ref: 'User' })
   user: ObjectId;
 
+  /**
+   * SubDocument, populate and lean option behave differently see in order service
+   */
   @Prop({
     type: [
       {
